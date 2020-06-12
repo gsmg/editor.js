@@ -2,16 +2,16 @@
  * Class Util
  */
 
-import Dom from './dom';
+import Dom from "./dom";
 
 /**
  * Possible log levels
  */
 export enum LogLevels {
-  VERBOSE = 'VERBOSE',
-  INFO = 'INFO',
-  WARN = 'WARN',
-  ERROR = 'ERROR',
+  VERBOSE = "VERBOSE",
+  INFO = "INFO",
+  WARN = "WARN",
+  ERROR = "ERROR",
 }
 
 /**
@@ -81,27 +81,27 @@ export const mouseButtons = {
 function _log(
   labeled: boolean,
   msg: string,
-  type = 'log',
+  type = "log",
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args?: any,
-  style = 'color: inherit'
+  style = "color: inherit"
 ): void {
-  if (!('console' in window) || !window.console[type]) {
+  if (!("console" in window) || !window.console[type]) {
     return;
   }
 
-  const isSimpleType = ['info', 'log', 'warn', 'error'].includes(type);
+  const isSimpleType = ["info", "log", "warn", "error"].includes(type);
   const argsToPass = [];
 
   switch (_log.logLevel) {
     case LogLevels.ERROR:
-      if (type !== 'error') {
+      if (type !== "error") {
         return;
       }
       break;
 
     case LogLevels.WARN:
-      if (!['error', 'warn'].includes(type)) {
+      if (!["error", "warn"].includes(type)) {
         return;
       }
       break;
@@ -181,12 +181,15 @@ export const logLabeled = _log.bind(window, true);
  * @returns {boolean}
  */
 export function isPrintableKey(keyCode: number): boolean {
-  return (keyCode > 47 && keyCode < 58) || // number keys
-    keyCode === 32 || keyCode === 13 || // Spacebar & return key(s)
+  return (
+    (keyCode > 47 && keyCode < 58) || // number keys
+    keyCode === 32 ||
+    keyCode === 13 || // Spacebar & return key(s)
     (keyCode > 64 && keyCode < 91) || // letter keys
     (keyCode > 95 && keyCode < 112) || // Numpad keys
     (keyCode > 185 && keyCode < 193) || // ;=,-./` (in order)
-    (keyCode > 218 && keyCode < 223); // [\]' (in order)
+    (keyCode > 218 && keyCode < 223)
+  ); // [\]' (in order)
 }
 
 /**
@@ -222,9 +225,13 @@ export async function sequence(
   ): Promise<void> {
     try {
       await chainData.function(chainData.data);
-      await successCallback(typeof chainData.data !== 'undefined' ? chainData.data : {});
+      await successCallback(
+        typeof chainData.data !== "undefined" ? chainData.data : {}
+      );
     } catch (e) {
-      fallbackCallback(typeof chainData.data !== 'undefined' ? chainData.data : {});
+      fallbackCallback(
+        typeof chainData.data !== "undefined" ? chainData.data : {}
+      );
     }
   }
 
@@ -263,7 +270,7 @@ export function array(collection: ArrayLike<any>): any[] {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isFunction(fn: any): fn is Function {
-  return typeof fn === 'function';
+  return typeof fn === "function";
 }
 
 /**
@@ -275,7 +282,7 @@ export function isFunction(fn: any): fn is Function {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isClass(fn: any): boolean {
-  return typeof fn === 'function' && /^\s*class\s+/.test(fn.toString());
+  return typeof fn === "function" && /^\s*class\s+/.test(fn.toString());
 }
 
 /**
@@ -315,8 +322,8 @@ export function delay(method: (...args: any[]) => any, timeout: number) {
   return function (): void {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const context = this,
-        // eslint-disable-next-line prefer-rest-params
-        args = arguments;
+      // eslint-disable-next-line prefer-rest-params
+      args = arguments;
 
     window.setTimeout(() => method.apply(context, args), timeout);
   };
@@ -330,7 +337,7 @@ export function delay(method: (...args: any[]) => any, timeout: number) {
  * @returns {string}
  */
 export function getFileExtension(file: File): string {
-  return file.name.split('.').pop();
+  return file.name.split(".").pop();
 }
 
 /**
@@ -355,14 +362,18 @@ export function isValidMimeType(type: string): boolean {
  * @param {boolean} immediate - call now
  * @returns {Function}
  */
-export function debounce(func: () => void, wait?: number, immediate?: boolean): () => void {
+export function debounce(
+  func: () => void,
+  wait?: number,
+  immediate?: boolean
+): () => void {
   let timeout;
 
   return (): void => {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const context = this,
-        // eslint-disable-next-line prefer-rest-params
-        args = arguments;
+      // eslint-disable-next-line prefer-rest-params
+      args = arguments;
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     const later = () => {
@@ -388,7 +399,8 @@ export function debounce(func: () => void, wait?: number, immediate?: boolean): 
  * @param text - text to copy
  */
 export function copyTextToClipboard(text): void {
-  const el = Dom.make('div', 'codex-editor-clipboard', {
+  console.log(text);
+  const el = Dom.make("div", "codex-editor-clipboard", {
     innerHTML: text,
   });
 
@@ -402,14 +414,14 @@ export function copyTextToClipboard(text): void {
   window.getSelection().removeAllRanges();
   selection.addRange(range);
 
-  document.execCommand('copy');
+  document.execCommand("copy");
   document.body.removeChild(el);
 }
 
 /**
  * Returns object with os name as key and boolean as value. Shows current user OS
  */
-export function getUserOS(): {[key: string]: boolean} {
+export function getUserOS(): { [key: string]: boolean } {
   const OS = {
     win: false,
     mac: false,
@@ -417,7 +429,9 @@ export function getUserOS(): {[key: string]: boolean} {
     linux: false,
   };
 
-  const userOS = Object.keys(OS).find((os: string) => navigator.appVersion.toLowerCase().indexOf(os) !== -1);
+  const userOS = Object.keys(OS).find(
+    (os: string) => navigator.appVersion.toLowerCase().indexOf(os) !== -1
+  );
 
   if (userOS) {
     OS[userOS] = true;
@@ -448,7 +462,10 @@ export function capitalize(text: string): string {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function typeOf(object: any): string {
-  return Object.prototype.toString.call(object).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+  return Object.prototype.toString
+    .call(object)
+    .match(/\s([a-zA-Z]+)/)[1]
+    .toLowerCase();
 }
 
 /**
@@ -459,7 +476,7 @@ export function typeOf(object: any): string {
  * @returns {object}
  */
 export function deepMerge<T extends object>(target, ...sources): T {
-  const isObject = (item): item is object => item && typeOf(item) === 'object';
+  const isObject = (item): item is object => item && typeOf(item) === "object";
 
   if (!sources.length) {
     return target;
@@ -493,7 +510,8 @@ export function deepMerge<T extends object>(target, ...sources): T {
  *
  * @returns {boolean}
  */
-export const isTouchSupported: boolean = 'ontouchstart' in document.documentElement;
+export const isTouchSupported: boolean =
+  "ontouchstart" in document.documentElement;
 
 /**
  * Make shortcut command more human-readable
@@ -504,22 +522,22 @@ export function beautifyShortcut(shortcut: string): string {
   const OS = getUserOS();
 
   shortcut = shortcut
-    .replace(/shift/gi, '⇧')
-    .replace(/backspace/gi, '⌫')
-    .replace(/enter/gi, '⏎')
-    .replace(/up/gi, '↑')
-    .replace(/left/gi, '→')
-    .replace(/down/gi, '↓')
-    .replace(/right/gi, '←')
-    .replace(/escape/gi, '⎋')
-    .replace(/insert/gi, 'Ins')
-    .replace(/delete/gi, '␡')
-    .replace(/\+/gi, ' + ');
+    .replace(/shift/gi, "⇧")
+    .replace(/backspace/gi, "⌫")
+    .replace(/enter/gi, "⏎")
+    .replace(/up/gi, "↑")
+    .replace(/left/gi, "→")
+    .replace(/down/gi, "↓")
+    .replace(/right/gi, "←")
+    .replace(/escape/gi, "⎋")
+    .replace(/insert/gi, "Ins")
+    .replace(/delete/gi, "␡")
+    .replace(/\+/gi, " + ");
 
   if (OS.mac) {
-    shortcut = shortcut.replace(/ctrl|cmd/gi, '⌘').replace(/alt/gi, '⌥');
+    shortcut = shortcut.replace(/ctrl|cmd/gi, "⌘").replace(/alt/gi, "⌥");
   } else {
-    shortcut = shortcut.replace(/cmd/gi, 'Ctrl').replace(/windows/gi, 'WIN');
+    shortcut = shortcut.replace(/cmd/gi, "Ctrl").replace(/windows/gi, "WIN");
   }
 
   return shortcut;
@@ -541,7 +559,7 @@ export function getValidUrl(url: string): string {
     // do nothing but handle below
   }
 
-  if (url.substring(0, 2) === '//') {
+  if (url.substring(0, 2) === "//") {
     return window.location.protocol + url;
   } else {
     return window.location.origin + url;
@@ -554,5 +572,5 @@ export function getValidUrl(url: string): string {
  * @param {string} url - URL address to redirect
  */
 export function openTab(url: string): void {
-  window.open(url, '_blank');
+  window.open(url, "_blank");
 }

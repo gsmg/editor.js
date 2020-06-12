@@ -9,27 +9,37 @@ export default class Wordformatter {
       return str.replace("·", "").replace(/\&nbsp;/g, "");
     };
 
-    Array.from(tmp.children).forEach((child) => {
-      if (child.classList.contains("MsoListParagraphCxSpFirst")) {
-        cleaned += `<ul><li>${cleanWordShit(child.innerHTML)}</li>`;
-        return;
+    const isWordString = [
+      "MsoListParagraphCxSpFirst",
+      "MsoListParagraphCxSpMiddle",
+      "MsoListParagraphCxSpLast",
+    ].some((el) => data.indexOf(el) !== -1);
+
+    if (isWordString) {
+      Array.from(tmp.children).forEach((child) => {
+        if (child.classList.contains("MsoListParagraphCxSpFirst")) {
+          cleaned += `<ul><li>${cleanWordShit(child.innerHTML)}</li>`;
+          return;
+        }
+
+        if (child.classList.contains("MsoListParagraphCxSpMiddle")) {
+          cleaned += `<li>${cleanWordShit(child.innerHTML)}</li>`;
+          return;
+        }
+
+        if (child.classList.contains("MsoListParagraphCxSpLast")) {
+          cleaned += `<li>${cleanWordShit(child.innerHTML)}</li></ul>`;
+          return;
+        }
+
+        cleaned += child.outerHTML;
+      });
+
+      if (!["paragraph", "header"].includes(currentBlockName)) {
+        cleaned = cleaned.replace(/(<(\/?p[^>]*)>)/gi, "");
       }
-
-      if (child.classList.contains("MsoListParagraphCxSpMiddle")) {
-        cleaned += `<li>${cleanWordShit(child.innerHTML)}</li>`;
-        return;
-      }
-
-      if (child.classList.contains("MsoListParagraphCxSpLast")) {
-        cleaned += `<li>${cleanWordShit(child.innerHTML)}</li></ul>`;
-        return;
-      }
-
-      cleaned += child.outerHTML;
-    });
-
-    if (!["paragraph", "header"].includes(currentBlockName)) {
-      cleaned = cleaned.replace(/(<(\/?p[^>]*)>)/gi, "");
+    } else {
+      cleaned = data;
     }
 
     return cleaned;
