@@ -341,6 +341,10 @@ export default class BlockEvents extends Module {
    * @param {KeyboardEvent} event - keydown
    */
   private backspace(event: KeyboardEvent): void {
+    if (event.target && (event.target as HTMLElement).nodeName === "INPUT") {
+      return;
+    }
+
     const { BlockManager, BlockSelection, Caret } = this.Editor;
     const currentBlock = BlockManager.currentBlock;
     const tool = this.Editor.Tools.available[currentBlock.name];
