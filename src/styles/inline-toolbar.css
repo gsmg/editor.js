@@ -40,8 +40,7 @@
     padding: 0 6px;
   }
 
-  &__actions {
-  }
+  &__actions {}
 
   &__dropdown {
     display: inline-flex;
@@ -60,7 +59,7 @@
       display: none;
     }
 
-    &-content{
+    &-content {
       display: flex;
       font-weight: 500;
       font-size: 14px;
@@ -112,6 +111,7 @@
     .icon--link {
       display: none;
     }
+
     .icon--unlink {
       display: inline-block;
       margin-bottom: -1px;
@@ -127,16 +127,11 @@
     padding: 10px;
     width: 100%;
     box-sizing: border-box;
-    display: none;
     font-weight: 500;
-    border-top: 1px solid rgba(201,201,204,.48);
+    border-top: 1px solid rgba(201, 201, 204, .48);
 
     &::placeholder {
       color: var(--grayText);
-    }
-
-    &--showed {
-      display: block;
     }
   }
 }

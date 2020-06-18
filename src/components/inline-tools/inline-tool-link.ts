@@ -1,9 +1,9 @@
-import SelectionUtils from '../selection';
+import SelectionUtils from "../selection";
 
-import $ from '../dom';
-import * as _ from '../utils';
-import { API, InlineTool, SanitizerConfig } from '../../../types';
-import { Notifier, Toolbar, I18n } from '../../../types/api';
+import $ from "../dom";
+import * as _ from "../utils";
+import { API, InlineTool, SanitizerConfig } from "../../../types";
+import { Notifier, Toolbar, I18n } from "../../../types/api";
 
 /**
  * Link Tool
@@ -23,7 +23,7 @@ export default class LinkInlineTool implements InlineTool {
   /**
    * Title for hover-tooltip
    */
-  public static title = 'Link';
+  public static title = "Link";
 
   /**
    * Sanitizer Rule
@@ -35,8 +35,8 @@ export default class LinkInlineTool implements InlineTool {
     return {
       a: {
         href: true,
-        target: '_blank',
-        rel: 'nofollow',
+        target: "_blank",
+        rel: "nofollow",
       },
     } as SanitizerConfig;
   }
@@ -44,8 +44,8 @@ export default class LinkInlineTool implements InlineTool {
   /**
    * Native Document's commands for link/unlink
    */
-  private readonly commandLink: string = 'createLink';
-  private readonly commandUnlink: string = 'unlink';
+  private readonly commandLink: string = "createLink";
+  private readonly commandUnlink: string = "unlink";
 
   /**
    * Enter key code
@@ -56,12 +56,12 @@ export default class LinkInlineTool implements InlineTool {
    * Styles
    */
   private readonly CSS = {
-    button: 'ce-inline-tool',
-    buttonActive: 'ce-inline-tool--active',
-    buttonModifier: 'ce-inline-tool--link',
-    buttonUnlink: 'ce-inline-tool--unlink',
-    input: 'ce-inline-tool-input',
-    inputShowed: 'ce-inline-tool-input--showed',
+    button: "ce-inline-tool",
+    buttonActive: "ce-inline-tool--active",
+    buttonModifier: "ce-inline-tool--link",
+    buttonUnlink: "ce-inline-tool--unlink",
+    input: "ce-inline-tool-input",
+    inputShowed: "ce-inline-tool-input--showed",
   };
 
   /**
@@ -70,9 +70,11 @@ export default class LinkInlineTool implements InlineTool {
   private nodes: {
     button: HTMLButtonElement;
     input: HTMLInputElement;
+    target: HTMLInputElement;
   } = {
     button: null,
     input: null,
+    target: null,
   };
 
   /**
@@ -120,11 +122,11 @@ export default class LinkInlineTool implements InlineTool {
    * Create button for Inline Toolbar
    */
   public render(): HTMLElement {
-    this.nodes.button = document.createElement('button') as HTMLButtonElement;
-    this.nodes.button.type = 'button';
+    this.nodes.button = document.createElement("button") as HTMLButtonElement;
+    this.nodes.button.type = "button";
     this.nodes.button.classList.add(this.CSS.button, this.CSS.buttonModifier);
-    this.nodes.button.appendChild($.svg('link', 14, 10));
-    this.nodes.button.appendChild($.svg('unlink', 15, 11));
+    this.nodes.button.appendChild($.svg("link", 14, 10));
+    this.nodes.button.appendChild($.svg("unlink", 15, 11));
 
     return this.nodes.button;
   }
@@ -133,16 +135,53 @@ export default class LinkInlineTool implements InlineTool {
    * Input for the link
    */
   public renderActions(): HTMLElement {
-    this.nodes.input = document.createElement('input') as HTMLInputElement;
-    this.nodes.input.placeholder = this.i18n.t('Add a link');
+    const wrap = document.createElement("div") as HTMLDivElement;
+
+    this.nodes.input = document.createElement("input") as HTMLInputElement;
+    this.nodes.input.placeholder = this.i18n.t("Add a link");
     this.nodes.input.classList.add(this.CSS.input);
-    this.nodes.input.addEventListener('keydown', (event: KeyboardEvent) => {
+    this.nodes.input.addEventListener("change", (e) => {
+      const tb = document.querySelector(".ce-inline-toolbar") as HTMLDivElement;
+      tb.style.width = `${this.nodes.input.value.length * 8}px`;
+    });
+    this.nodes.input.addEventListener("keydown", (event: KeyboardEvent) => {
       if (event.keyCode === this.ENTER_KEY) {
         this.enterPressed(event);
       }
     });
 
-    return this.nodes.input;
+    this.nodes.target = document.createElement("input") as HTMLInputElement;
+    this.nodes.target.type = "checkbox";
+    this.nodes.target.className = "ml-2";
+
+    const label = document.createElement("label") as HTMLLabelElement;
+    label.className = "p-2 d-flex align-items-center";
+    label.innerHTML = "Neuer Tab";
+
+    const ok = document.createElement("button") as HTMLButtonElement;
+    ok.type = "button";
+    ok.className = "p-2";
+    ok.setAttribute(
+      "style",
+      "border: none; background: #0a861f; width: 100%; display: block; color: white;"
+    );
+    ok.innerHTML = `Speichern`;
+    ok.addEventListener("click", (e) => {
+      this.enterPressed();
+    });
+
+    const utils = document.createElement("div") as HTMLDivElement;
+    utils.className = "d-none";
+
+    label.appendChild(this.nodes.target);
+
+    utils.appendChild(this.nodes.input);
+    utils.appendChild(label);
+    utils.appendChild(ok);
+
+    wrap.appendChild(utils);
+
+    return wrap;
   }
 
   /**
@@ -166,7 +205,7 @@ export default class LinkInlineTool implements InlineTool {
         this.selection.restore();
         this.selection.removeFakeBackground();
       }
-      const parentAnchor = this.selection.findParentTag('A');
+      const parentAnchor = this.selection.findParentTag("A");
 
       /**
        * Unlink icon pressed
@@ -191,7 +230,7 @@ export default class LinkInlineTool implements InlineTool {
    * @param {Selection} selection - selection to check
    */
   public checkState(selection?: Selection): boolean {
-    const anchorTag = this.selection.findParentTag('A');
+    const anchorTag = this.selection.findParentTag("A");
 
     if (anchorTag) {
       this.nodes.button.classList.add(this.CSS.buttonUnlink);
@@ -201,9 +240,14 @@ export default class LinkInlineTool implements InlineTool {
       /**
        * Fill input value with link href
        */
-      const hrefAttr = anchorTag.getAttribute('href');
+      const hrefAttr = anchorTag.getAttribute("href");
+      const targetAttr = anchorTag.getAttribute("target");
 
-      this.nodes.input.value = hrefAttr !== 'null' ? hrefAttr : '';
+      this.nodes.input.value = hrefAttr !== "null" ? hrefAttr : "";
+      const tb = document.querySelector(".ce-inline-toolbar") as HTMLDivElement;
+      tb.style.width = `${this.nodes.input.value.length * 8}px`;
+
+      this.nodes.target.checked = targetAttr === "_blank";
 
       this.selection.save();
     } else {
@@ -225,7 +269,7 @@ export default class LinkInlineTool implements InlineTool {
    * Set a shortcut
    */
   public get shortcut(): string {
-    return 'CMD+K';
+    return "CMD+K";
   }
 
   /**
@@ -243,7 +287,7 @@ export default class LinkInlineTool implements InlineTool {
    * @param {boolean} needFocus - on link creation we need to focus input. On editing - nope.
    */
   private openActions(needFocus = false): void {
-    this.nodes.input.classList.add(this.CSS.inputShowed);
+    this.nodes.input.parentElement.classList.remove("d-none");
     if (needFocus) {
       this.nodes.input.focus();
     }
@@ -270,8 +314,9 @@ export default class LinkInlineTool implements InlineTool {
       currentSelection.restore();
     }
 
-    this.nodes.input.classList.remove(this.CSS.inputShowed);
-    this.nodes.input.value = '';
+    this.nodes.input.parentElement.classList.add("d-none");
+    this.nodes.input.value = "";
+    this.nodes.target.checked = false;
     if (clearSavedSelection) {
       this.selection.clearSaved();
     }
@@ -283,23 +328,26 @@ export default class LinkInlineTool implements InlineTool {
    *
    * @param {KeyboardEvent} event - enter keydown event
    */
-  private enterPressed(event: KeyboardEvent): void {
-    let value = this.nodes.input.value || '';
+  private enterPressed(event?: KeyboardEvent): void {
+    let value = this.nodes.input.value || "";
+    const target = this.nodes.target.checked ? "_blank" : "self";
 
     if (!value.trim()) {
       this.selection.restore();
       this.unlink();
-      event.preventDefault();
+      if (event) {
+        event.preventDefault();
+      }
       this.closeActions();
     }
 
     if (!this.validateURL(value)) {
       this.notifier.show({
-        message: 'Pasted link is not valid.',
-        style: 'error',
+        message: "Pasted link is not valid.",
+        style: "error",
       });
 
-      _.log('Incorrect Link pasted', 'warn', value);
+      _.log("Incorrect Link pasted", "warn", value);
 
       return;
     }
@@ -309,14 +357,16 @@ export default class LinkInlineTool implements InlineTool {
     this.selection.restore();
     this.selection.removeFakeBackground();
 
-    this.insertLink(value);
+    this.insertLink(value, target);
 
     /**
      * Preventing events that will be able to happen
      */
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
     this.selection.collapseToEnd();
     this.inlineToolbar.close();
   }
@@ -368,11 +418,11 @@ export default class LinkInlineTool implements InlineTool {
      *     3) Protocol-relative URLs like "//google.com"
      */
     const isInternal = /^\/[^/\s]/.test(link),
-        isAnchor = link.substring(0, 1) === '#',
-        isProtocolRelative = /^\/\/[^/\s]/.test(link);
+      isAnchor = link.substring(0, 1) === "#",
+      isProtocolRelative = /^\/\/[^/\s]/.test(link);
 
     if (!isInternal && !isAnchor && !isProtocolRelative) {
-      link = 'http://' + link;
+      link = "http://" + link;
     }
 
     return link;
@@ -383,17 +433,20 @@ export default class LinkInlineTool implements InlineTool {
    *
    * @param {string} link - "href" value
    */
-  private insertLink(link: string): void {
+  private insertLink(link: string, target = "self"): void {
     /**
      * Edit all link, not selected part
      */
-    const anchorTag = this.selection.findParentTag('A');
+    const anchorTag = this.selection.findParentTag("A");
 
     if (anchorTag) {
       this.selection.expandToTag(anchorTag);
     }
 
     document.execCommand(this.commandLink, false, link);
+    const selection = document.getSelection();
+
+    selection.anchorNode.parentElement.setAttribute("target", target);
   }
 
   /**
