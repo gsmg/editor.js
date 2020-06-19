@@ -143,6 +143,7 @@ export default class LinkInlineTool implements InlineTool {
     this.nodes.input.addEventListener("change", (e) => {
       const tb = document.querySelector(".ce-inline-toolbar") as HTMLDivElement;
       tb.style.width = `${this.nodes.input.value.length * 8}px`;
+      tb.style.minWidth = "168px";
     });
     this.nodes.input.addEventListener("keydown", (event: KeyboardEvent) => {
       if (event.keyCode === this.ENTER_KEY) {
@@ -246,6 +247,7 @@ export default class LinkInlineTool implements InlineTool {
       this.nodes.input.value = hrefAttr !== "null" ? hrefAttr : "";
       const tb = document.querySelector(".ce-inline-toolbar") as HTMLDivElement;
       tb.style.width = `${this.nodes.input.value.length * 8}px`;
+      tb.style.minWidth = "168px";
 
       this.nodes.target.checked = targetAttr === "_blank";
 
