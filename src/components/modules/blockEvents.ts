@@ -341,7 +341,6 @@ export default class BlockEvents extends Module {
    * @param {KeyboardEvent} event - keydown
    */
   private backspace(event: KeyboardEvent): void {
-    console.log(event);
     if (
       (event.target && (event.target as HTMLElement).nodeName === "INPUT") ||
       ((event.target as HTMLElement).nodeName === "DIV" &&
