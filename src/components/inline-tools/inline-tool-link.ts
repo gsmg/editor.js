@@ -446,9 +446,12 @@ export default class LinkInlineTool implements InlineTool {
     }
 
     document.execCommand(this.commandLink, false, link);
-    const selection = document.getSelection();
-
-    selection.anchorNode.parentElement.setAttribute("target", target);
+    const selection = window.getSelection();
+    if (selection.anchorNode.nodeName.toLowerCase() === 'a') {
+      selection.anchorNode.parentElement.children[0].setAttribute('target', target);
+    } else {
+      selection.anchorNode.parentElement.setAttribute('target', target);
+    }
   }
 
   /**
