@@ -447,6 +447,7 @@ export default class LinkInlineTool implements InlineTool {
 
     document.execCommand(this.commandLink, false, link);
     const selection = window.getSelection();
+    console.log(selection);
     if (selection.anchorNode.nodeName.toLowerCase() === 'a') {
       selection.anchorNode.parentElement.children[0].setAttribute('target', target);
     } else {
