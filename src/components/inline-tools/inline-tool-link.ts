@@ -446,12 +446,26 @@ export default class LinkInlineTool implements InlineTool {
     }
 
     document.execCommand(this.commandLink, false, link);
-    const selection = window.getSelection();
-    console.log(selection);
-    if (selection.anchorNode.nodeName.toLowerCase() === 'a') {
-      selection.anchorNode.parentElement.children[0].setAttribute('target', target);
-    } else {
+    const selection = document.getSelection();
+    if (selection.anchorNode.nodeName.toLowerCase() === '#text' &&
+      selection.anchorNode.parentElement.nodeName.toLowerCase() === 'a') {
       selection.anchorNode.parentElement.setAttribute('target', target);
+    } else {
+      const commonAncestor = selection.getRangeAt(0).commonAncestorContainer as HTMLElement;
+
+      if (commonAncestor.tagName.toLowerCase() === 'a') {
+        commonAncestor.setAttribute('target', target);
+      } else {
+        commonAncestor
+          .querySelectorAll('a')
+          .forEach((node) => {
+            const href = node.getAttribute('href');
+            console.log('second inner', href, target, link);
+            if (href.trim().toLowerCase() === link.trim().toLowerCase()) {
+              node.setAttribute('target', target);
+            }
+          });
+      }
     }
   }
 
